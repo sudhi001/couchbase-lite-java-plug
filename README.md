@@ -63,7 +63,7 @@ public class Contact implements Entity {
 ```java
 public class ContactRepository extends DocumentRepository<Contact> {
     public ContactRepository( ) {
-        super( Contact.class);
+        super( Contact.class,Contact.class.getName().toLowerCase());
 
     }
 
@@ -76,7 +76,26 @@ public class ContactRepository extends DocumentRepository<Contact> {
 }
 
 ```
+
+ # Or Repository support AES encryption (Using SQLiteCipher)
+   ```java
+
+public class ContactRepository extends DocumentRepository<Contact> {
+    public ContactRepository() {
+        super( Contact.class,Contact.class.getName().toLowerCase(),"AADMIN123#",System.getProperty("user.home"),"example/data/");
+
+    }
+
+    @Override
+    public void createIndex() {
+        super.createIndex();
+
+}
+
+}
+   ```
 # Implementation
+
 ```java
 
   ContactRepository contactRepository= new ContactRepository();
