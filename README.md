@@ -1,5 +1,7 @@
 # couchbase-lite-java-plug
 
+This is base on couchbase lite 1.4.4  implementation. If you are an Android developer then Please don't prefer this.
+
 # Model
 ```java
 
