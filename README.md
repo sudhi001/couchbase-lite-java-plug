@@ -5,6 +5,15 @@ This is base on couchbase lite 1.4.4  implementation. If you are an Android deve
 ## Intention to create this Library
 Usually when you are planning to implement a lite Nosql embeded database , We may have differenty options, but those databases are keyvalue based databases that loose the ORM functionality. Here my solution is for the users those prefer to implement Couchbase lite as database.
 
+### Usage 
+
+<pre>
+   <dependency>
+          <groupId>com.blockplug.dblite</groupId>
+          <artifactId>couchbase-lite-java-plug</artifactId>
+          <version>1.0-SNAPSHOT</version>
+      </dependency>
+</pre>
 
 # Model
 ```java
