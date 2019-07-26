@@ -7,7 +7,7 @@ This is base on couchbase lite 1.4.4  implementation. If you are an Android deve
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
+import com.couchbase.lite.Document;
 import java.util.Date;
 
 public class Contact implements Entity {
