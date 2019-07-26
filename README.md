@@ -76,7 +76,7 @@ public class ContactRepository extends DocumentRepository<Contact> {
 }
 
 ```
-# Implemntation
+# Implementation
 ```java
 
   ContactRepository contactRepository= new ContactRepository();
