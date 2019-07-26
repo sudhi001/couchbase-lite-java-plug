@@ -59,7 +59,7 @@ public class Contact implements Entity {
 ```
 # Repository
 ```java
-public class ContactRepository extends BaseDocumentRepository<Contact> {
+public class ContactRepository extends DocumentRepository<Contact> {
     public ContactRepository( ) {
         super( Contact.class);
 

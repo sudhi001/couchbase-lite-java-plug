@@ -16,6 +16,7 @@ package com.blockplug.dblite;
  */
 
 import com.couchbase.lite.*;
+import com.couchbase.lite.Document;
 import com.couchbase.lite.internal.database.util.TextUtils;
 import javafx.beans.property.ObjectProperty;
 
@@ -36,8 +37,23 @@ public abstract class DocumentRepository<T extends Entity> {
     private Database database;
     private Class aClass;
     private Manager manager;
-    final String tableName;
-
+    private final String tableName;
+    static List<Class> knownItems = new LinkedList<Class>(){
+        {
+            add(String.class);
+            add(Integer.class);
+            add(Float.class);
+            add(Date.class);
+            add(Array.class);
+            add(Boolean.class);
+            add(Blob.class);
+            add(Number.class);
+            add(Long.class);
+            add(long.class);
+            add(double.class);
+            add(Dictionary.class);
+        }
+    };
     /**
      * Simple implementation
      * @param aClass
@@ -86,20 +102,12 @@ public abstract class DocumentRepository<T extends Entity> {
     /**
      * Create an index based on the document id
      */
-    private void createIndex() {
+    public void createIndex() {
         View todoView = database.getView(tableName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
     }
 
-    /**
-     * Close the database instance.
-     * Better you should call this function before the application termination.
-     */
-    public void close() {
-        if (database != null) {
-                database.close();
-        }
-    }
+
 
     /**
      * Find the document by id
@@ -199,42 +207,26 @@ public abstract class DocumentRepository<T extends Entity> {
      * @param object
      * @return
      */
+
+    /**
+     * A document is created using Registration object with the help of Reflections.
+     * The getter field name is set as key the document attributes.
+     * @param document
+     * @param object
+     * @return
+     */
     private Map createDocument(Map document, Object object) {
         Map<Field, Method> methodLinkedHashMap = allGetMethodsAndFields(object.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
-                Method method = methodLinkedHashMap.get(field);
+            Method method = methodLinkedHashMap.get(field);
             try {
                 Object value = method.invoke(object);
                 if (value != null) {
                     if (value!=null&&value instanceof  KeyValue) {
                         KeyValue keyValue= (KeyValue) value;
                         document.put(field.getName(), keyValue.getKey()+":"+keyValue.getName());
-                    }else if (field.getType() == String.class) {
-                        document.put(field.getName(), value.toString());
-                    } else if (field.getType() == Integer.class) {
-                        document.put(field.getName(), (int) value);
-                    } else if (field.getType() == Float.class) {
-                        document.put(field.getName(), (float) value);
-                    } else if (field.getType() == Date.class) {
-                        document.put(field.getName(), (Date) value);
-                    } else if (field.getType() == Array.class) {
-                        document.put(field.getName(), (Array) value);
-                    } else if (field.getType() == Boolean.class) {
+                    }else if (isKnownType(field.getType()))
                         document.put(field.getName(), value);
-                    } else if (field.getType() == Blob.class) {
-                        document.put(field.getName(), (Blob) value);
-                    } else if (field.getType() == Number.class) {
-                        document.put(field.getName(), (Number) value);
-                    } else if (field.getType() == Long.class) {
-                        document.put(field.getName(), (Long) value);
-                    } else if (field.getType() == long.class) {
-                        document.put(field.getName(), (long) value);
-                    }else if (field.getType() == int.class) {
-                        document.put(field.getName(), (int) value);
-                    }else if (field.getType() == double.class) {
-                        document.put(field.getName(), (double) value);
-                    }else if (field.getType() == Dictionary.class)
-                        document.put(field.getName(), (Dictionary) value);
                 } else {
                     document.put(field.getName(), null);
                 }
@@ -247,10 +239,11 @@ public abstract class DocumentRepository<T extends Entity> {
         return document;
     }
 
+
+
     private Map createDocument(Object object) {
         return createDocument(new HashMap(), object);
     }
-
     private List<Method> listGetMethods(Class clazz) {
         List<Method> methodsList = new ArrayList<>();
         while (clazz != null) {
@@ -264,7 +257,6 @@ public abstract class DocumentRepository<T extends Entity> {
         }
         return methodsList;
     }
-
     private List<Method> listSetMethods(Class clazz) {
         List<Method> methodsList = new ArrayList<>();
         while (clazz != null) {
@@ -290,14 +282,13 @@ public abstract class DocumentRepository<T extends Entity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                Document documentProperty = field.getAnnotation(Document.class);
+                com.blockplug.dblite.Document documentProperty = field.getAnnotation(com.blockplug.dblite.Document.class);
                 if (documentProperty != null) filedList.put(field, method);
             }
         }
         mapOfFieldGetMethod.putAll(filedList);
         return filedList;
     }
-
     private Map<Field, Method> methodsAndFields(Class clazz) {
         if (!mapOfFieldMethod.isEmpty())
             return mapOfFieldMethod;
@@ -309,15 +300,13 @@ public abstract class DocumentRepository<T extends Entity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                Document documentProperty = field.getAnnotation(Document.class);
+                com.blockplug.dblite.Document documentProperty = field.getAnnotation(com.blockplug.dblite.Document.class);
                 if (documentProperty != null) filedList.put(field, method);
             }
         }
-
         mapOfFieldMethod.putAll(filedList);
         return filedList;
     }
-
     private Field getField(Class clazz, String fieldName) {
         if (clazz != null) try {
             return clazz.getDeclaredField(fieldName);
@@ -326,8 +315,7 @@ public abstract class DocumentRepository<T extends Entity> {
         }
         return null;
     }
-
-    private void copyTo(com.couchbase.lite.Document document, Object object) {
+    private void copyTo(Document document, Object object) {
         T data = (T) object;
         Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
@@ -337,7 +325,7 @@ public abstract class DocumentRepository<T extends Entity> {
                 if (document.getProperty(field.getName())!=null && method != null) {
                     if (field.getType() == Date.class) {
                         Object value = document.getProperty(field.getName());
-                        if(value instanceof Long) {
+                        if(value instanceof  Long) {
                             method.invoke(data, new Date((Long)value));
                         }else{
                             method.invoke(data,(Date)document.getProperty(field.getName()));
@@ -365,12 +353,28 @@ public abstract class DocumentRepository<T extends Entity> {
             data.setDocumentID(document.getId());
         }
     }
+    /**
+     * To check the Type of data is supported by the library of Couchbase Lite
+     * @param type  {@link Class}
+     * @return If true then the type of data is supported else not.
+     */
+    public boolean isKnownType(Class<?> type) {
+        return  knownItems.contains(type);
+    }
 
+    /**
+     *  To get the Couchbase Database object
+     * @return
+     */
     public Database getDatabase() {
         return database;
     }
 
-    public boolean delete() {
+    /**
+     * To delete the Datbase
+     * @return
+     */
+    public boolean delete()  {
         try {
             database.delete();
             database.close();
@@ -382,19 +386,39 @@ public abstract class DocumentRepository<T extends Entity> {
         return true;
     }
 
+    /**
+     * @return List of saved entities
+     */
     public List<T> findAll() {
         return findBy(getDatabase().createAllDocumentsQuery());
     }
 
+    /**
+     * @return Total number of rows
+     */
     public int count() {
         return database.getDocumentCount();
     }
-    public List<T> pageOF(int offset, int limit) {
+
+    /**
+     * Pagination function
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public List<T> pageOF(int offset,int limit) {
         Query query= database.createAllDocumentsQuery();
         query.setLimit(limit);
         query.setSkip(offset);
         return findBy(query);
     }
-
-
+    /**
+     * Close the database instance.
+     * Better you should call this function before the application termination.
+     */
+    public void close() {
+        if (database != null) {
+            database.close();
+        }
+    }
 }
