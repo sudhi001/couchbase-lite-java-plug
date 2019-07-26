@@ -2,12 +2,9 @@ package com.blockplug.dblite;
 
 import com.couchbase.lite.*;
 import com.couchbase.lite.internal.database.util.TextUtils;
-import in.neoex.application.form.KeyValue;
-import in.neoex.application.form.annotation.FormModel;
-import in.neoex.application.manager.SectionManager;
-import io.neoex.application.annotation.NXTransactional;
 import javafx.beans.property.ObjectProperty;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +12,9 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.util.*;
 
-public abstract class DocumentRepository<T extends Entity<T>> {
+public abstract class DocumentRepository<T extends Entity> {
+    private final String rootDirectoryPath;
+    private final String dbPath;
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
     Map<Field, Method> mapOfFieldMethod = new LinkedHashMap<>();
     Map<Field, Method> mapOfFieldGetMethod = new LinkedHashMap<>();
@@ -23,24 +22,30 @@ public abstract class DocumentRepository<T extends Entity<T>> {
     private Class aClass;
     private Manager manager;
     final String tableName;
-    public DocumentRepository(Class aClass) {
-        this.aClass=aClass;
-        FormModel table = aClass.getClass().getAnnotation(FormModel.class);
-        if (table != null && !TextUtils.isEmpty(table.table())) {
-            tableName=table.table();
-        } else {
-            this.tableName=aClass.getSimpleName();
-        }
-        openOrInitDatabase( );
+    public DocumentRepository(Class aClass,String tableName) {
+        this(aClass,tableName,null,null,null);
     }
-    private void openOrInitDatabase( ){
+    public DocumentRepository(Class aClass,String tableName,String password, String rootDirectoryPath ,String dbPath) {
+        this.aClass=aClass;
+        this.tableName=tableName;
+        this.rootDirectoryPath=rootDirectoryPath;
+        this.dbPath=dbPath;
+        openOrInitDatabase(password );
+    }
+    private void openOrInitDatabase(String password ){
         try {
-            String password = SectionManager.getInstance().getDbPassword();
             DatabaseOptions options = new DatabaseOptions();
             options.setCreate(true);
-           // options.setStorageType(Manager.FORESTDB_STORAGE);
-            options.setEncryptionKey(password);
-            this.manager = new Manager(new NXContext("db"), Manager.DEFAULT_OPTIONS);
+            if(password!=null) {
+                options.setEncryptionKey(password);
+            }
+            this.manager = new Manager(new JavaContext(){
+                @Override
+                public File getRootDirectory() {
+                    return (rootDirectoryPath!=null&&dbPath!=null)?new File(rootDirectoryPath, dbPath):super.getRootDirectory();
+                }
+
+            }, Manager.DEFAULT_OPTIONS);
                 database = manager.openDatabase(tableName.toLowerCase(), options);
                 createIndex();
         } catch (Exception e) {
@@ -70,7 +75,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
      * @return
      */
 
-    public Document findById(String id) {
+    public com.couchbase.lite.Document findById(String id) {
         return database.getDocument(id);
     }
 
@@ -80,7 +85,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
             List<T> dataSet = new LinkedList<>();
             QueryEnumerator result = query.run();
             T object;
-            Document document = null;
+            com.couchbase.lite.Document document = null;
             for (Iterator<QueryRow> it = result; it.hasNext(); ) {
                 QueryRow row = it.next();
                 document = row.getDocument();
@@ -110,7 +115,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
      */
     public boolean deleteByDocumentId(String documentId) {
         try {
-            Document document = database.getDocument(documentId);
+            com.couchbase.lite.Document document = database.getDocument(documentId);
             if(document!=null){
                 document.delete();
             }else{
@@ -134,7 +139,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
      */
     public <T extends Entity> T save(T entity) {
         try {
-            Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
+            com.couchbase.lite.Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
             Map properties= createDocument(entity);
             if (document == null) {
                 document =  this.database.createDocument();
@@ -168,9 +173,6 @@ public abstract class DocumentRepository<T extends Entity<T>> {
             try {
                 Object value = method.invoke(object);
                 if (value != null) {
-                    switch (field.getType().hashCode()){
-
-                    }
                     if (value!=null&&value instanceof  KeyValue) {
                         KeyValue keyValue= (KeyValue) value;
                         document.put(field.getName(), keyValue.getKey()+":"+keyValue.getName());
@@ -255,7 +257,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                NXTransactional documentProperty = field.getAnnotation(NXTransactional.class);
+                Document documentProperty = field.getAnnotation(Document.class);
                 if (documentProperty != null) filedList.put(field, method);
             }
         }
@@ -274,7 +276,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                NXTransactional documentProperty = field.getAnnotation(NXTransactional.class);
+                Document documentProperty = field.getAnnotation(Document.class);
                 if (documentProperty != null) filedList.put(field, method);
             }
         }
@@ -292,7 +294,7 @@ public abstract class DocumentRepository<T extends Entity<T>> {
         return null;
     }
 
-    private void copyTo(Document document, Object object) {
+    private void copyTo(com.couchbase.lite.Document document, Object object) {
         T data = (T) object;
         Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
@@ -340,7 +342,6 @@ public abstract class DocumentRepository<T extends Entity<T>> {
             database.delete();
             database.close();
             database=null;
-            openOrInitDatabase();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return false;
