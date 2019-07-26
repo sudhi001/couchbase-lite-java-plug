@@ -7,13 +7,13 @@ Usually when you are planning to implement a lite Nosql embeded database , We ma
 
 ### Usage 
 
-<pre>
+```
    <dependency>
           <groupId>com.blockplug.dblite</groupId>
           <artifactId>couchbase-lite-java-plug</artifactId>
           <version>1.0-SNAPSHOT</version>
       </dependency>
-</pre>
+```
 
 # Model
 ```java
