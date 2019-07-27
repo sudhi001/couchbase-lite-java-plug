@@ -10,18 +10,18 @@ Usually when you are planning to implement a lite Nosql embeded database , We ma
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import com.couchbase.lite.Document;
+import com.couchbase.lite.DocumentColumn;
 import java.util.Date;
 
 public class Contact implements Entity {
-    @Document(key = "DOCUMENT_ID")
+    @DocumentColumn(key = "DOCUMENT_ID")
     private String documentID;
 
-    @Document(key = "CONTACT_NAME")
+    @DocumentColumn(key = "CONTACT_NAME")
     private String name;
-    @Document(key = "CONTACT_GENDER")
+    @DocumentColumn(key = "CONTACT_GENDER")
     private ObjectProperty<KeyValue> gender = new SimpleObjectProperty<>();
-    @Document(key = "CONTACT_DATE_OF_BIRTH")
+    @DocumentColumn(key = "CONTACT_DATE_OF_BIRTH")
     private Date dateOfBirth;
 
     @Override

@@ -30,6 +30,7 @@
 
 
   <dependencies>
+
     <dependency>
         <groupId>com.couchbase.lite</groupId>
         <artifactId>couchbase-lite-java</artifactId>

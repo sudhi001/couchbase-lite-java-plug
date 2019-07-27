@@ -150,7 +150,7 @@ public abstract class DocumentRepository<T extends Entity> {
     }
 
     /**
-     * Delete Document by id
+     * Delete DocumentColumn by id
      * @param documentId
      * @return
      */
@@ -282,8 +282,8 @@ public abstract class DocumentRepository<T extends Entity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                com.blockplug.dblite.Document documentProperty = field.getAnnotation(com.blockplug.dblite.Document.class);
-                if (documentProperty != null) filedList.put(field, method);
+                DocumentColumn documentColumnProperty = field.getAnnotation(DocumentColumn.class);
+                if (documentColumnProperty != null) filedList.put(field, method);
             }
         }
         mapOfFieldGetMethod.putAll(filedList);
@@ -300,8 +300,8 @@ public abstract class DocumentRepository<T extends Entity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                com.blockplug.dblite.Document documentProperty = field.getAnnotation(com.blockplug.dblite.Document.class);
-                if (documentProperty != null) filedList.put(field, method);
+                DocumentColumn documentColumnProperty = field.getAnnotation(DocumentColumn.class);
+                if (documentColumnProperty != null) filedList.put(field, method);
             }
         }
         mapOfFieldMethod.putAll(filedList);
