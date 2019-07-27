@@ -66,6 +66,16 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
     /**
      *
      * @param aClass
+     * @param password
+     * @param rootDirectoryPath
+     * @param dbPath
+     */
+    public DocumentRepository(Class aClass,String password, String rootDirectoryPath ,String dbPath) {
+        this(aClass,null,password,rootDirectoryPath,dbPath);
+    }
+    /**
+     *
+     * @param aClass
      * @param tableName
      * @param password
      * @param rootDirectoryPath
@@ -73,7 +83,18 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      */
     public DocumentRepository(Class aClass,String tableName,String password, String rootDirectoryPath ,String dbPath) {
         this.aClass=aClass;
-        this.tableName=tableName;
+        if(tableName==null){
+            if(aClass.isAnnotationPresent(DocumentNode.class)){
+                DocumentNode documentNode = (DocumentNode) aClass.getAnnotation(DocumentNode.class);
+                this.tableName= documentNode.name();
+            }else{
+                throw new RuntimeException("Invalid Table name");
+            }
+
+        }else{
+            this.tableName=tableName;
+        }
+
         this.rootDirectoryPath=rootDirectoryPath;
         this.dbPath=dbPath;
         openOrInitDatabase(password );
