@@ -421,4 +421,12 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
             database.close();
         }
     }
+
+    /**
+     *
+     * @return Name of the current table
+     */
+    public String getTableName() {
+        return tableName;
+    }
 }
