@@ -16,9 +16,7 @@ package com.blockplug.dblite;
  */
 
 import com.couchbase.lite.*;
-import com.couchbase.lite.Document;
 import com.couchbase.lite.internal.database.util.TextUtils;
-import com.sun.deploy.util.StringUtils;
 import javafx.beans.property.ObjectProperty;
 
 import java.io.File;
