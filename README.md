@@ -27,7 +27,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import com.couchbase.lite.DocumentColumn;
 import java.util.Date;
 
-public class Contact implements Entity {
+public class Contact implements DocumentEntity {
     @DocumentColumn(key = "DOCUMENT_ID")
     private String documentID;
 

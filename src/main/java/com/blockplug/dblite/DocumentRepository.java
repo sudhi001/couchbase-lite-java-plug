@@ -28,7 +28,7 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.util.*;
 
-public abstract class DocumentRepository<T extends Entity> {
+public abstract class DocumentRepository<T extends DocumentEntity> {
     private final String rootDirectoryPath;
     private final String dbPath;
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
@@ -178,7 +178,7 @@ public abstract class DocumentRepository<T extends Entity> {
      * @param <T>
      * @return
      */
-    public <T extends Entity> T save(T entity) {
+    public <T extends DocumentEntity> T save(T entity) {
         try {
             com.couchbase.lite.Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
             Map properties= createDocument(entity);
