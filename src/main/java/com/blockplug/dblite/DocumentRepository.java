@@ -18,6 +18,7 @@ package com.blockplug.dblite;
 import com.couchbase.lite.*;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.internal.database.util.TextUtils;
+import com.sun.deploy.util.StringUtils;
 import javafx.beans.property.ObjectProperty;
 
 import java.io.File;
@@ -86,9 +87,10 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
         if(tableName==null){
             if(aClass.isAnnotationPresent(DocumentNode.class)){
                 DocumentNode documentNode = (DocumentNode) aClass.getAnnotation(DocumentNode.class);
-                this.tableName= documentNode.name();
+                this.tableName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():aClass.getName().toLowerCase();
             }else{
-                throw new RuntimeException("Invalid Table name");
+                this.tableName= aClass.getName().toLowerCase();
+
             }
 
         }else{
