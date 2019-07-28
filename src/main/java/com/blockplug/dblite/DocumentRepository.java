@@ -148,6 +148,31 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
         return database.getDocument(id);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public T findOneById(String id) {
+        Document document = database.getDocument(id);
+        if (document != null) {
+            T object = null;
+            try {
+                object = (T) aClass.getDeclaredConstructor().newInstance();
+                copyTo(document, object);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            return object;
+        }
+        return null;
+    }
 
     public List<T> findBy(Query query) {
         try {
