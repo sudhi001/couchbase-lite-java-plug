@@ -249,14 +249,16 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
             Method method = methodLinkedHashMap.get(field);
             try {
                 Object value = method.invoke(object);
+                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
                 if (value != null) {
                     if (value!=null&&value instanceof  KeyValue) {
                         KeyValue keyValue= (KeyValue) value;
-                        document.put(field.getName(), keyValue.getKey()+":"+keyValue.getName());
+                        document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
                     }else if (isKnownType(field.getType()))
-                        document.put(field.getName(), value);
+
+                        document.put(documentColumn.key(), value);
                 } else {
-                    document.put(field.getName(), null);
+                    document.put(documentColumn.key(), null);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -310,8 +312,9 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                DocumentColumn documentColumnProperty = field.getAnnotation(DocumentColumn.class);
-                if (documentColumnProperty != null) filedList.put(field, method);
+                if(field.isAnnotationPresent(DocumentColumn.class)) {
+                    filedList.put(field, method);
+                }
             }
         }
         mapOfFieldGetMethod.putAll(filedList);
@@ -328,8 +331,9 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                DocumentColumn documentColumnProperty = field.getAnnotation(DocumentColumn.class);
-                if (documentColumnProperty != null) filedList.put(field, method);
+                if(field.isAnnotationPresent(DocumentColumn.class)) {
+                    filedList.put(field, method);
+                }
             }
         }
         mapOfFieldMethod.putAll(filedList);
@@ -348,18 +352,19 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
         Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
             try {
+                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
                 Method method = methodLinkedHashMap.get(field);
                 field.setAccessible(true);
-                if (document.getProperty(field.getName())!=null && method != null) {
+                if (document.getProperty(documentColumn.key())!=null && method != null) {
                     if (field.getType() == Date.class) {
-                        Object value = document.getProperty(field.getName());
+                        Object value = document.getProperty(documentColumn.key());
                         if(value instanceof  Long) {
                             method.invoke(data, new Date((Long)value));
                         }else{
-                            method.invoke(data,(Date)document.getProperty(field.getName()));
+                            method.invoke(data,(Date)document.getProperty(documentColumn.key()));
                         }
                     }else if(field.getType() ==  ObjectProperty.class){
-                        Object value = document.getProperty(field.getName());
+                        Object value = document.getProperty(documentColumn.key());
                         if(value!=null){
                             String[] datas = value.toString().split(":");
                             if(datas.length>1){
@@ -368,7 +373,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
                         }
                     }
                     else{
-                        method.invoke(data, document.getProperty(field.getName()));
+                        method.invoke(data, document.getProperty(documentColumn.key()));
                     }
 
                 }

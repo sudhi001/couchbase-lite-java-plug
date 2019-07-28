@@ -20,8 +20,8 @@ import java.io.Serializable;
 
 
 public interface DocumentEntity extends Serializable {
-     String getDocumentID();
+     public String getDocumentID();
 
-     void setDocumentID(String documentID);
+     public void setDocumentID(String documentID);
 }
 
