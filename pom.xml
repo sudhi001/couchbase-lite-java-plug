@@ -103,8 +103,7 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/sudhi001/couchbase-lite-java-plug.git</connection>
-        <developerConnection>scm:git:ssh://github.com/sudhi001/couchbase-lite-java-plug.git</developerConnection>
+        <connection>scm:git:https://github.com/sudhi001/couchbase-lite-java-plug.git</connection>
         <url>http://github.com/sudhi001/couchbase-lite-java-plug</url>
         <tag>HEAD</tag>
     </scm>
