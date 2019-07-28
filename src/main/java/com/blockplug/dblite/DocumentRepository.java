@@ -251,7 +251,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
                 Object value = method.invoke(object);
                 DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
                 if (value != null) {
-                    if (value!=null&&value instanceof  KeyValue) {
+                   if (field.getType() ==  ObjectProperty.class){
                         KeyValue keyValue= (KeyValue) value;
                         document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
                     }else if (isKnownType(field.getType()))
