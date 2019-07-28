@@ -6,7 +6,7 @@
 
     <groupId>com.blockplug.dblite</groupId>
     <artifactId>couchbase-lite-java-plug</artifactId>
-    <version>1.0.1-GA</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Couchbase Lite ORM Utility Library for Javafx Developers</name>
