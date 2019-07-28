@@ -106,7 +106,9 @@
         <connection>scm:git:git://github.com/sudhi001/couchbase-lite-java-plug.git</connection>
         <developerConnection>scm:git:ssh://github.com/sudhi001/couchbase-lite-java-plug.git</developerConnection>
         <url>http://github.com/sudhi001/couchbase-lite-java-plug</url>
+        <tag>HEAD</tag>
     </scm>
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
