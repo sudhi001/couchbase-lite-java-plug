@@ -118,7 +118,6 @@
         <url>https://github.com/sudhi001/couchbase-lite-java-plug</url>
         <connection>scm:git:https://github.com/sudhi001/couchbase-lite-java-plug</connection>
     </scm>
-    </scm>
 
     <licenses>
         <license>
