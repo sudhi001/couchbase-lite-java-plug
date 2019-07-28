@@ -64,6 +64,13 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
 
     /**
      *
+     * @param config = {@link DBConfig}
+     */
+    public DocumentRepository(DBConfig config) {
+        this(config.getEntityType(),config.getDbPassword(),config.getRootFolderPath(),config.getDbPath());
+    }
+    /**
+     *
      * @param aClass
      * @param password
      * @param rootDirectoryPath
