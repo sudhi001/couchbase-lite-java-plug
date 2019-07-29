@@ -45,7 +45,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
             add(Date.class);
             add(Array.class);
             add(Boolean.class);
-            add(Blob.class);
+            add(byte[].class);
             add(Number.class);
             add(Long.class);
             add(long.class);
