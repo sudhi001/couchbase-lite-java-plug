@@ -279,6 +279,8 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
                    if (field.getType() ==  ObjectProperty.class){
                         KeyValue keyValue= (KeyValue) value;
                         document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
+                    }else if (field.getType() ==  byte[].class){
+                        document.put(documentColumn.key(), (byte[])value);
                     }else if (isKnownType(field.getType()))
 
                         document.put(documentColumn.key(), value);
