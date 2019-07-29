@@ -279,10 +279,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
                    if (field.getType() ==  ObjectProperty.class){
                         KeyValue keyValue= (KeyValue) value;
                         document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
-                    }else if (field.getType() ==  byte[].class){
-                        document.put(documentColumn.key(), (byte[])value);
                     }else if (isKnownType(field.getType()))
-
                         document.put(documentColumn.key(), value);
                 } else {
                     document.put(documentColumn.key(), null);
@@ -397,6 +394,12 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
                             if(datas.length>1){
                                 method.invoke(data, new KeyValue(datas[1],datas[0]));
                             }
+                        }
+                    }else if(field.getType() ==  byte[].class){
+                        Object value = document.getProperty(documentColumn.key());
+                        if(value!=null){
+                            byte[] datas = value.toString().getBytes();
+                                method.invoke(data, datas);
                         }
                     }
                     else{
