@@ -468,6 +468,19 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
         Query query= database.createAllDocumentsQuery();
         query.setLimit(limit);
         query.setSkip(offset);
+        query.setDescending(true);
+        return findBy(query);
+    }
+    /**
+     * Pagination function
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public List<T> pageOFAcending(int offset,int limit) {
+        Query query= database.createAllDocumentsQuery();
+        query.setLimit(limit);
+        query.setSkip(offset);
         return findBy(query);
     }
     /**

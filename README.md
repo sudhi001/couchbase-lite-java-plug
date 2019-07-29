@@ -11,12 +11,12 @@ Usually when you are planning to implement a lite Nosql embeded database , We ma
    <dependency>
           <groupId>com.blockplug.dblite</groupId>
           <artifactId>couchbase-lite-java-plug</artifactId>
-          <version>1.0.5-SNAPSHOT</version>
+          <version>1.0.6-SNAPSHOT</version>
       </dependency>
 ```
 ### Gradle Usage
 ```
-  compile 'com.blockplug.dblite:couchbase-lite-java-plug:1.0.5-SNAPSHOT
+  compile 'com.blockplug.dblite:couchbase-lite-java-plug:1.0.6-SNAPSHOT
   ```
 
 # Model
