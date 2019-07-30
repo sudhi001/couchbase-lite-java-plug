@@ -27,7 +27,7 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.util.*;
 
-public abstract class DocumentRepository<T extends DocumentEntity> {
+public abstract class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>{
     private final String rootDirectoryPath;
     private final String dbPath;
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
@@ -130,6 +130,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
     /**
      * Create an index based on the document id
      */
+    @Override
     public void createIndex() {
         View todoView = database.getView(tableName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
@@ -144,6 +145,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @return
      */
 
+    @Override
     public com.couchbase.lite.Document findById(String id) {
         return database.getDocument(id);
     }
@@ -153,6 +155,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param id
      * @return
      */
+    @Override
     public T findOneById(String id) {
         Document document = database.getDocument(id);
         if (document != null) {
@@ -173,7 +176,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
         }
         return null;
     }
-
+@Override
     public List<T> findBy(Query query) {
         try {
             List<T> dataSet = new LinkedList<>();
@@ -207,6 +210,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param documentId
      * @return
      */
+    @Override
     public boolean deleteByDocumentId(String documentId) {
         try {
             com.couchbase.lite.Document document = database.getDocument(documentId);
@@ -231,7 +235,8 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param <T>
      * @return
      */
-    public <T extends DocumentEntity> T save(T entity) {
+    @Override
+    public  T save(T entity) {
         try {
             com.couchbase.lite.Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
             Map properties= createDocument(entity);
@@ -421,6 +426,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param type  {@link Class}
      * @return If true then the type of data is supported else not.
      */
+    @Override
     public boolean isKnownType(Class<?> type) {
         return  knownItems.contains(type);
     }
@@ -429,6 +435,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      *  To get the Couchbase Database object
      * @return
      */
+    @Override
     public Database getDatabase() {
         return database;
     }
@@ -437,6 +444,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * To delete the Datbase
      * @return
      */
+    @Override
     public boolean delete()  {
         try {
             database.delete();
@@ -452,6 +460,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
     /**
      * @return List of saved entities
      */
+    @Override
     public List<T> findAll() {
         return findBy(getDatabase().createAllDocumentsQuery());
     }
@@ -459,6 +468,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
     /**
      * @return Total number of rows
      */
+    @Override
     public int count() {
         return database.getDocumentCount();
     }
@@ -469,6 +479,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param limit
      * @return
      */
+    @Override
     public List<T> pageOF(int offset,int limit) {
         Query query= database.createAllDocumentsQuery();
         query.setLimit(limit);
@@ -482,6 +493,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * @param limit
      * @return
      */
+    @Override
     public List<T> pageOFAcending(int offset,int limit) {
         Query query= database.createAllDocumentsQuery();
         query.setLimit(limit);
@@ -492,6 +504,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      * Close the database instance.
      * Better you should call this function before the application termination.
      */
+    @Override
     public void close() {
         if (database != null) {
             database.close();
@@ -502,6 +515,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> {
      *
      * @return Name of the current table
      */
+    @Override
     public String getTableName() {
         return tableName;
     }
