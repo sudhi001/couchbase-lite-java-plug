@@ -1,4 +1,3 @@
-package com.blockplug.dblite;
 /**
  *  Copyright 20199 Sudhi S sudhis@live.com / droidsworld@gmail.com
  *
@@ -14,6 +13,8 @@ package com.blockplug.dblite;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.blockplug.dblite;
+
 
 import java.lang.annotation.*;
 
