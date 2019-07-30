@@ -55,8 +55,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     };
     /**
      * Simple implementation
-     * @param aClass
-     * @param tableName
+
      */
     public DocumentRepository(Class aClass,String tableName) {
         this(aClass,tableName,null,null,null);
@@ -69,24 +68,11 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     public DocumentRepository(DBConfig config) {
         this(config.getEntityType(),config.getDbPassword(),config.getRootFolderPath(),config.getDbPath());
     }
-    /**
-     *
-     * @param aClass
-     * @param password
-     * @param rootDirectoryPath
-     * @param dbPath
-     */
+
     public DocumentRepository(Class aClass,String password, String rootDirectoryPath ,String dbPath) {
         this(aClass,null,password,rootDirectoryPath,dbPath);
     }
-    /**
-     *
-     * @param aClass
-     * @param tableName
-     * @param password
-     * @param rootDirectoryPath
-     * @param dbPath
-     */
+
     public DocumentRepository(Class aClass,String tableName,String password, String rootDirectoryPath ,String dbPath) {
         this.aClass=aClass;
         if(tableName==null){
@@ -141,8 +127,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     /**
      * Find the document by id
      *
-     * @param id
-     * @return
      */
 
     @Override
@@ -152,8 +136,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
 
     /**
      *
-     * @param id
-     * @return
      */
     @Override
     public T findOneById(String id) {
@@ -207,8 +189,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
 
     /**
      * Delete DocumentColumn by id
-     * @param documentId
-     * @return
      */
     @Override
     public boolean deleteByDocumentId(String documentId) {
@@ -231,9 +211,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     /**
      * Save or Update the entity
      *
-     * @param entity
-     * @param <T>
-     * @return
      */
     @Override
     public  T save(T entity) {
@@ -261,17 +238,11 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     /**
      * A document is created using Registration object with the help of Reflections.
      * The getter field name is set as key the document attributes.
-     * @param document
-     * @param object
-     * @return
      */
 
     /**
      * A document is created using Registration object with the help of Reflections.
      * The getter field name is set as key the document attributes.
-     * @param document
-     * @param object
-     * @return
      */
     private Map createDocument(Map document, Object object) {
         Map<Field, Method> methodLinkedHashMap = allGetMethodsAndFields(object.getClass());
@@ -433,7 +404,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
 
     /**
      *  To get the Couchbase Database object
-     * @return
      */
     @Override
     public Database getDatabase() {
@@ -441,8 +411,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     }
 
     /**
-     * To delete the Datbase
-     * @return
+     * To delete the Database
      */
     @Override
     public boolean delete()  {
@@ -475,9 +444,6 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
 
     /**
      * Pagination function
-     * @param offset
-     * @param limit
-     * @return
      */
     @Override
     public List<T> pageOF(int offset,int limit) {
@@ -489,9 +455,9 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
     }
     /**
      * Pagination function
-     * @param offset
-     * @param limit
-     * @return
+     * @param offset  Where the pagination stats
+     * @param limit  Maximum number of items per page
+     * @return List ot items
      */
     @Override
     public List<T> pageOFAcending(int offset,int limit) {
