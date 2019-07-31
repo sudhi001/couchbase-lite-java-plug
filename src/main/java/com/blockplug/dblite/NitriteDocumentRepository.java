@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseDocumentRepository<T>{
+public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseDocumentRepository<T> implements INitriteRepository<T>{
     Nitrite database;
     NitriteCollection collection ;
     String collectionName ;
@@ -103,9 +103,11 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     @Override
     public List<T> findAll() {
         Cursor cursor= collection.find();
-        return findByCursor(cursor);
+        return findBy(cursor);
     }
-    public List<T> findByCursor(Cursor cursor) {
+
+    @Override
+    public List<T> findBy(Cursor cursor) {
         List<T> data= new ArrayList<>();
         T object;
         for (Document document : cursor) {
@@ -126,6 +128,8 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
         }
         return data;
     }
+
+
     @Override
     public long count() {
         return collection.size();
@@ -134,13 +138,13 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     @Override
     public List<T> pageOF(int offset, int limit) {
         Cursor cursor= collection.find(FindOptions.limit(offset,limit));
-        return findByCursor(cursor);
+        return findBy(cursor);
     }
 
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
         Cursor cursor= collection.find(FindOptions.sort(createdTime,SortOrder.Ascending).limit(offset,limit));
-        return findByCursor(cursor);
+        return findBy(cursor);
     }
 
     @Override

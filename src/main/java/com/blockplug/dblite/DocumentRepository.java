@@ -4,8 +4,9 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Query;
 
+import java.awt.*;
 import java.util.List;
-public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T> ,ICBRepository<T>{
+public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T> ,ICBRepository<T>,INitriteRepository<T>{
 
     IBaseRepository<T> baseRepository;
     public DocumentRepository(DBConfig config) {
@@ -51,6 +52,15 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
     @Override
     public boolean deleteByDocumentId(String documentId) {
         return baseRepository.deleteByDocumentId(documentId);
+    }
+
+    @Override
+    public List<T> findBy(Cursor cursor) {
+        if(baseRepository instanceof INitriteRepository){
+            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+            return repository.findBy(cursor);
+        }
+        throw  new RuntimeException("Invalid operation");
     }
 
     @Override
