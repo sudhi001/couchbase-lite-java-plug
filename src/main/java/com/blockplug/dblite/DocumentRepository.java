@@ -137,4 +137,13 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
         }
         throw  new RuntimeException("Invalid operation");
     }
+
+    @Override
+    public Cursor find(Filter filter, FindOptions findOptions) {
+        if(baseRepository instanceof INitriteRepository){
+            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+            return repository.find(filter,findOptions);
+        }
+        throw  new RuntimeException("Invalid operation");
+    }
 }

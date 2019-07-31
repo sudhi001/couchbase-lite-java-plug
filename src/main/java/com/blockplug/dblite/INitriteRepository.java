@@ -11,4 +11,5 @@ public interface INitriteRepository<T extends DocumentEntity> extends IBaseRepos
     public List<T> findBy(Cursor cursor);
     public  Cursor find(FindOptions findOptions);
     public List<T> find(Filter filter);
+    public  Cursor find(Filter filter,FindOptions findOptions);
 }
