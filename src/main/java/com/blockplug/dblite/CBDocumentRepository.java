@@ -24,10 +24,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Array;
-import java.sql.Blob;
 import java.util.*;
 
-public abstract class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>{
+public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>{
     private final String rootDirectoryPath;
     private final String dbPath;
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
@@ -57,7 +56,7 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
      * Simple implementation
 
      */
-    public DocumentRepository(Class aClass,String tableName) {
+    public CBDocumentRepository(Class aClass, String tableName) {
         this(aClass,tableName,null,null,null);
     }
 
@@ -65,15 +64,15 @@ public abstract class DocumentRepository<T extends DocumentEntity> implements IB
      *
      * @param config = {@link DBConfig}
      */
-    public DocumentRepository(DBConfig config) {
+    public CBDocumentRepository(DBConfig config) {
         this(config.getEntityType(),config.getDbPassword(),config.getRootFolderPath(),config.getDbPath());
     }
 
-    public DocumentRepository(Class aClass,String password, String rootDirectoryPath ,String dbPath) {
+    public CBDocumentRepository(Class aClass, String password, String rootDirectoryPath , String dbPath) {
         this(aClass,null,password,rootDirectoryPath,dbPath);
     }
 
-    public DocumentRepository(Class aClass,String tableName,String password, String rootDirectoryPath ,String dbPath) {
+    public CBDocumentRepository(Class aClass, String tableName, String password, String rootDirectoryPath , String dbPath) {
         this.aClass=aClass;
         if(tableName==null){
             if(aClass.isAnnotationPresent(DocumentNode.class)){

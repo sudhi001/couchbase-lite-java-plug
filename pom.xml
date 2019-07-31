@@ -39,6 +39,11 @@
           <artifactId>couchbase-lite-java-sqlcipher</artifactId>
           <version>${couchbase.lite.version}</version>
       </dependency>
+      <dependency>
+          <groupId>org.dizitart</groupId>
+          <artifactId>nitrite</artifactId>
+          <version>3.2.0</version>
+      </dependency>
 </dependencies>
 
     <build>
