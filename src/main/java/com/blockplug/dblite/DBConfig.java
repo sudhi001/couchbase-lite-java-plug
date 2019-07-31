@@ -15,19 +15,23 @@
  */package com.blockplug.dblite;
 
 public class DBConfig {
-    private final String rootFolderPath;
     private final String dbPath;
     private final String dbPassword;
     private final  Class entityType;
-
+    private final String collectionName;
+    private final DBName dbName;
+    private  String dbUsername;
     private DBConfig(Builder builder) {
-        this.rootFolderPath = builder.rootFolderPath;
         this.dbPath = builder.dbPath;
         this.dbPassword = builder.dbPassword;
         this.entityType=builder.entityType;
+        this.collectionName =builder.collectionName;
+        this.dbName=builder.dbName;
+        this.dbUsername=builder.dbUsername;
     }
-    public String getRootFolderPath() {
-        return rootFolderPath;
+
+    public String getDbUsername() {
+        return dbUsername;
     }
 
     public String getDbPath() {
@@ -42,18 +46,40 @@ public class DBConfig {
         return entityType;
     }
 
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public DBName getDbName() {
+        return dbName;
+    }
+
     public static class Builder {
-        private  String rootFolderPath;
         private  String dbPath;
+        private  String dbUsername;
         private  String dbPassword;
         private   Class entityType;
-        public Builder setRootFolderPath(String rootFolderPath) {
-            this.rootFolderPath = rootFolderPath;
+        private  String collectionName;
+        private  DBName dbName=DBName.COUCHBASE;
+
+
+        public Builder setDbName(DBName dbName) {
+            this.dbName = dbName;
+            return this;
+        }
+
+        public Builder setDbUsername(String dbUsername) {
+            this.dbUsername = dbUsername;
             return this;
         }
 
         public Builder setEntityType(Class entityType) {
             this.entityType = entityType;
+            return this;
+        }
+
+        public Builder setCollectionName(String collectionName) {
+            this.collectionName = collectionName;
             return this;
         }
 

@@ -17,95 +17,63 @@ package com.blockplug.dblite;
 
 import com.couchbase.lite.*;
 import com.couchbase.lite.internal.database.util.TextUtils;
-import javafx.beans.property.ObjectProperty;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.Array;
 import java.util.*;
 
-public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>{
-    private final String rootDirectoryPath;
-    private final String dbPath;
+public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumentRepository<T> implements ICBRepository<T>{
+
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
-    Map<Field, Method> mapOfFieldMethod = new LinkedHashMap<>();
-    Map<Field, Method> mapOfFieldGetMethod = new LinkedHashMap<>();
+
     private Database database;
     private Class aClass;
     private Manager manager;
-    private final String tableName;
-    static List<Class> knownItems = new LinkedList<Class>(){
-        {
-            add(String.class);
-            add(Integer.class);
-            add(Float.class);
-            add(Date.class);
-            add(Array.class);
-            add(Boolean.class);
-            add(byte[].class);
-            add(Number.class);
-            add(Long.class);
-            add(long.class);
-            add(double.class);
-            add(Dictionary.class);
-        }
-    };
-    /**
-     * Simple implementation
+    private String collectionName;
 
-     */
-    public CBDocumentRepository(Class aClass, String tableName) {
-        this(aClass,tableName,null,null,null);
-    }
 
     /**
      *
      * @param config = {@link DBConfig}
      */
     public CBDocumentRepository(DBConfig config) {
-        this(config.getEntityType(),config.getDbPassword(),config.getRootFolderPath(),config.getDbPath());
+        super(config);
+        init(config);
     }
 
-    public CBDocumentRepository(Class aClass, String password, String rootDirectoryPath , String dbPath) {
-        this(aClass,null,password,rootDirectoryPath,dbPath);
-    }
 
-    public CBDocumentRepository(Class aClass, String tableName, String password, String rootDirectoryPath , String dbPath) {
-        this.aClass=aClass;
-        if(tableName==null){
+
+    private void init(DBConfig config) {
+        this.aClass=config.getClass();
+        if(config.getCollectionName()==null){
             if(aClass.isAnnotationPresent(DocumentNode.class)){
                 DocumentNode documentNode = (DocumentNode) aClass.getAnnotation(DocumentNode.class);
-                this.tableName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():aClass.getName().toLowerCase();
+                this.collectionName = (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():aClass.getName().toLowerCase();
             }else{
-                this.tableName= aClass.getName().toLowerCase();
-
+                this.collectionName = aClass.getName().toLowerCase();
             }
 
         }else{
-            this.tableName=tableName;
+            this.collectionName =config.getCollectionName();
         }
 
-        this.rootDirectoryPath=rootDirectoryPath;
-        this.dbPath=dbPath;
-        openOrInitDatabase(password );
+        openOrInitDatabase( );
     }
-    private void openOrInitDatabase(String password ){
+    private void openOrInitDatabase(  ){
         try {
             DatabaseOptions options = new DatabaseOptions();
             options.setCreate(true);
-            if(password!=null) {
-                options.setEncryptionKey(password);
+            if(getConfig().getDbPassword()!=null) {
+                options.setEncryptionKey(getConfig().getDbPassword());
             }
             this.manager = new Manager(new JavaContext(){
                 @Override
                 public File getRootDirectory() {
-                    return (rootDirectoryPath!=null&&dbPath!=null)?new File(rootDirectoryPath, dbPath):super.getRootDirectory();
+                    return getConfig().getDbPath()!=null?new File(getConfig().getDbPath()):super.getRootDirectory();
                 }
 
             }, Manager.DEFAULT_OPTIONS);
-                database = manager.openDatabase(tableName.toLowerCase(), options);
+                database = manager.openDatabase(collectionName.toLowerCase(), options);
                 createIndex();
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +85,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
      */
     @Override
     public void createIndex() {
-        View todoView = database.getView(tableName);
+        View todoView = database.getView(collectionName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
     }
 
@@ -143,7 +111,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
             T object = null;
             try {
                 object = (T) aClass.getDeclaredConstructor().newInstance();
-                copyTo(document, object);
+                copyCouchBaseDocumentToEntity(document, object);
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -168,7 +136,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
                 QueryRow row = it.next();
                 document = row.getDocument();
                 object = (T) aClass.getDeclaredConstructor().newInstance();
-                copyTo(document, object);
+                copyCouchBaseDocumentToEntity(document, object);
                 dataSet.add(object);
             }
             return dataSet;
@@ -215,7 +183,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
     public  T save(T entity) {
         try {
             com.couchbase.lite.Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
-            Map properties= createDocument(entity);
+            Map properties= createMapFromEntity(entity);
             if (document == null) {
                 document =  this.database.createDocument();
                 entity.setDocumentID(document.putProperties(properties).getDocument().getId());
@@ -234,163 +202,8 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
         }
     }
 
-    /**
-     * A document is created using Registration object with the help of Reflections.
-     * The getter field name is set as key the document attributes.
-     */
-
-    /**
-     * A document is created using Registration object with the help of Reflections.
-     * The getter field name is set as key the document attributes.
-     */
-    private Map createDocument(Map document, Object object) {
-        Map<Field, Method> methodLinkedHashMap = allGetMethodsAndFields(object.getClass());
-        for (Field field : methodLinkedHashMap.keySet()) {
-            Method method = methodLinkedHashMap.get(field);
-            try {
-                Object value = method.invoke(object);
-                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
-                if (value != null) {
-                   if (field.getType() ==  ObjectProperty.class){
-                        KeyValue keyValue= (KeyValue) value;
-                        document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
-                    }else if (isKnownType(field.getType()))
-                        document.put(documentColumn.key(), value);
-                } else {
-                    document.put(documentColumn.key(), null);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return document;
-    }
 
 
-
-    private Map createDocument(Object object) {
-        return createDocument(new HashMap(), object);
-    }
-    private List<Method> listGetMethods(Class clazz) {
-        List<Method> methodsList = new ArrayList<>();
-        while (clazz != null) {
-            Method[] methods = clazz.getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getName().startsWith("get")) {
-                    methodsList.add(method);
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-        return methodsList;
-    }
-    private List<Method> listSetMethods(Class clazz) {
-        List<Method> methodsList = new ArrayList<>();
-        while (clazz != null) {
-            Method[] methods = clazz.getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getName().startsWith("set")) {
-                    methodsList.add(method);
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-        return methodsList;
-    }
-
-    private Map<Field, Method> allGetMethodsAndFields(Class clazz) {
-        if (!mapOfFieldGetMethod.isEmpty())
-            return mapOfFieldGetMethod;
-        Map<Field, Method> filedList = new LinkedHashMap<>();
-        List<Method> setMethods = listGetMethods(clazz);
-        for (Method method : setMethods) {
-            String methodName = method.getName();
-            String fieldName = String.valueOf(methodName.charAt(3)).toLowerCase() + methodName.substring(4);
-            Field field = getField(clazz, fieldName);
-            if (field != null) {
-                field.setAccessible(true);
-                if(field.isAnnotationPresent(DocumentColumn.class)) {
-                    filedList.put(field, method);
-                }
-            }
-        }
-        mapOfFieldGetMethod.putAll(filedList);
-        return filedList;
-    }
-    private Map<Field, Method> methodsAndFields(Class clazz) {
-        if (!mapOfFieldMethod.isEmpty())
-            return mapOfFieldMethod;
-        Map<Field, Method> filedList = new LinkedHashMap<>();
-        List<Method> setMethods = listSetMethods(clazz);
-        for (Method method : setMethods) {
-            String methodName = method.getName();
-            String fieldName = String.valueOf(methodName.charAt(3)).toLowerCase() + methodName.substring(4);
-            Field field = getField(clazz, fieldName);
-            if (field != null) {
-                field.setAccessible(true);
-                if(field.isAnnotationPresent(DocumentColumn.class)) {
-                    filedList.put(field, method);
-                }
-            }
-        }
-        mapOfFieldMethod.putAll(filedList);
-        return filedList;
-    }
-    private Field getField(Class clazz, String fieldName) {
-        if (clazz != null) try {
-            return clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            return getField(clazz.getSuperclass(), fieldName);
-        }
-        return null;
-    }
-    private void copyTo(Document document, Object object) {
-        T data = (T) object;
-        Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
-        for (Field field : methodLinkedHashMap.keySet()) {
-            try {
-                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
-                Method method = methodLinkedHashMap.get(field);
-                field.setAccessible(true);
-                if (document.getProperty(documentColumn.key())!=null && method != null) {
-                    if (field.getType() == Date.class) {
-                        Object value = document.getProperty(documentColumn.key());
-                        if(value instanceof  Long) {
-                            method.invoke(data, new Date((Long)value));
-                        }else{
-                            method.invoke(data,(Date)document.getProperty(documentColumn.key()));
-                        }
-                    }else if(field.getType() ==  ObjectProperty.class){
-                        Object value = document.getProperty(documentColumn.key());
-                        if(value!=null){
-                            String[] datas = value.toString().split(":");
-                            if(datas.length>1){
-                                method.invoke(data, new KeyValue(datas[1],datas[0]));
-                            }
-                        }
-                    }else if(field.getType() ==  byte[].class){
-                        Object value = document.getProperty(documentColumn.key());
-                        if(value!=null){
-                            byte[] datas = value.toString().getBytes();
-                                method.invoke(data, datas);
-                        }
-                    }
-                    else{
-                        method.invoke(data, document.getProperty(documentColumn.key()));
-                    }
-
-                }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-            data.setDocumentID(document.getId());
-        }
-    }
     /**
      * To check the Type of data is supported by the library of Couchbase Lite
      * @param type  {@link Class}
@@ -437,7 +250,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
      * @return Total number of rows
      */
     @Override
-    public int count() {
+    public long count() {
         return database.getDocumentCount();
     }
 
@@ -459,7 +272,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
      * @return List ot items
      */
     @Override
-    public List<T> pageOFAcending(int offset,int limit) {
+    public List<T> pageOFAscending(int offset, int limit) {
         Query query= database.createAllDocumentsQuery();
         query.setLimit(limit);
         query.setSkip(offset);
@@ -481,7 +294,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> implements IBaseRep
      * @return Name of the current table
      */
     @Override
-    public String getTableName() {
-        return tableName;
+    public String getCollectionName() {
+        return collectionName;
     }
 }

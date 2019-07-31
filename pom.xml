@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blockplug.dblite</groupId>
-    <artifactId>couchbase-lite-java-plug</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <artifactId>embeded-database</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Couchbase Lite ORM Utility Library for Javafx Developers</name>
-    <description>This is a sample library for a integrating couchbase lite with you Javafx application like an ORM Library</description>
+    <name>Couchbase or Nitrite DB  Lite ORM Utility Library for Javafx Developers</name>
+    <description>This is a sample library for a integrating couchbase lite 1.X or Nitrite DB with you Javafx application like an ORM Library</description>
     <url>https://github.com/sudhi001/couchbase-lite-java-plug</url>
     <developers>
         <developer>

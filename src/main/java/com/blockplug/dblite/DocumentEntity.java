@@ -20,6 +20,8 @@ import java.io.Serializable;
 
 
 public interface DocumentEntity extends Serializable {
+     public long getCreatedTime();
+     public void setCreatedTime(long time);
      public String getDocumentID();
 
      public void setDocumentID(String documentID);
