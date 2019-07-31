@@ -4,6 +4,7 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Query;
 import org.dizitart.no2.Cursor;
+import org.dizitart.no2.Filter;
 import org.dizitart.no2.FindOptions;
 
 import java.awt.*;
@@ -124,6 +125,15 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
         if(baseRepository instanceof INitriteRepository){
             INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
             return repository.find(findOptions);
+        }
+        throw  new RuntimeException("Invalid operation");
+    }
+
+    @Override
+    public List<T> find(Filter filter) {
+        if(baseRepository instanceof INitriteRepository){
+            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+            return repository.find(filter);
         }
         throw  new RuntimeException("Invalid operation");
     }

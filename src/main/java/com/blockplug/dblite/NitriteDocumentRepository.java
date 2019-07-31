@@ -140,6 +140,11 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
         Cursor cursor= collection.find(FindOptions.limit(offset,limit));
         return findBy(cursor);
     }
+    @Override
+    public List<T> find(Filter filter) {
+        Cursor cursor= collection.find(filter);
+        return findBy(cursor);
+    }
 
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
