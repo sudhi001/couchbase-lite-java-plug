@@ -157,7 +157,7 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
         return collectionName;
     }
     @Override
-    public  Cursor find(){
+    public  Cursor find(FindOptions findOptions){
         return collection.find();
     }
 }
