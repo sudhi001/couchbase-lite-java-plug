@@ -3,6 +3,7 @@ package com.blockplug.dblite;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Query;
+import org.dizitart.no2.Cursor;
 
 import java.awt.*;
 import java.util.List;
