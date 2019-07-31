@@ -156,4 +156,8 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     public String getCollectionName() {
         return collectionName;
     }
+    @Override
+    public  Cursor find(){
+        return collection.find();
+    }
 }

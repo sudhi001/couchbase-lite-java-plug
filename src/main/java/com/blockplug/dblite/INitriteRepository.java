@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface INitriteRepository<T extends DocumentEntity> extends IBaseRepository<T>{
 
-    List<T> findBy(Cursor cursor);
+    public List<T> findBy(Cursor cursor);
+    public  Cursor find();
 }

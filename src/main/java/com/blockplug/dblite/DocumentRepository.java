@@ -118,4 +118,12 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
         return baseRepository.getCollectionName();
     }
 
+    @Override
+    public Cursor find() {
+        if(baseRepository instanceof INitriteRepository){
+            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+            return repository.find();
+        }
+        throw  new RuntimeException("Invalid operation");
+    }
 }
