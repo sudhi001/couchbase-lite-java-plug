@@ -34,12 +34,12 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
             this.collectionName=config.getCollectionName();
         }
         File file=new File(config.getDbPath()+File.separator);
-        if(!file.exists()||file.isDirectory()){
+        if(!file.exists()||!file.isDirectory()){
             file.mkdirs();
         }
         database= Nitrite.builder()
                 .compressed()
-                .filePath(new File(config.getDbPath()+File.separator+collectionName+".db"))
+                .filePath(new File(config.getDbPath()+collectionName+".db"))
                 .openOrCreate(config.getDbUsername(), config.getDbPassword());
         collection = database.getCollection(collectionName);
 
