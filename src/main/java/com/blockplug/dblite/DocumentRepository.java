@@ -26,6 +26,7 @@ public class DocumentRepository<T extends DocumentEntity> implements IBaseReposi
             default:
                 throw new RuntimeException("Invalid database selection");
         }
+        baseRepository.createIndex();
     }
 
     @Override

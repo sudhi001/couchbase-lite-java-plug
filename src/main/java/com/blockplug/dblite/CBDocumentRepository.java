@@ -72,7 +72,6 @@ public class CBDocumentRepository<T extends DocumentEntity> extends BaseDocument
 
             }, Manager.DEFAULT_OPTIONS);
             database = manager.openDatabase(collectionName.toLowerCase(), options);
-            createIndex();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,8 +80,8 @@ public class CBDocumentRepository<T extends DocumentEntity> extends BaseDocument
     /**
      * Create an index based on the document id
      */
-
-    private void createIndex() {
+    @Override
+    public void createIndex() {
         View todoView = database.getView(collectionName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
         onDocumentLifeListener.createIndex();
