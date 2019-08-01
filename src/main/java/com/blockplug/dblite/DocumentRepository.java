@@ -13,7 +13,7 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
     protected  static final  String DOCUMENT_ID = "DOCUMENT_ID";
     IBaseRepository<T> baseRepository;
     public DocumentRepository(DBConfig config) {
-        switch (config.getDbName()){
+        switch (config.getDbType()){
             case COUCHBASE:baseRepository= new CBDocumentRepository(config);break;
             case NITRITE:baseRepository= new NitriteDocumentRepository(config);break;
                 default:throw new RuntimeException("Invalid database selection");

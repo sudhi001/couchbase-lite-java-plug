@@ -1,5 +1,5 @@
 package com.blockplug.dblite;
 
-public enum DBName {
+public enum DBType {
     COUCHBASE,NITRITE;
 }

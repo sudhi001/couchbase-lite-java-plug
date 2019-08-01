@@ -27,7 +27,6 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
 
     private Database database;
-    private Class aClass;
     private Manager manager;
     private String collectionName;
 
@@ -44,13 +43,12 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
 
 
     private void init(DBConfig config) {
-        this.aClass=config.getClass();
         if(config.getCollectionName()==null){
-            if(aClass.isAnnotationPresent(DocumentNode.class)){
-                DocumentNode documentNode = (DocumentNode) aClass.getAnnotation(DocumentNode.class);
-                this.collectionName = (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():aClass.getName().toLowerCase();
+            if(config.getEntityType().isAnnotationPresent(DocumentNode.class)){
+                DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
+                this.collectionName = (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
             }else{
-                this.collectionName = aClass.getName().toLowerCase();
+                this.collectionName = config.getEntityType().getName().toLowerCase();
             }
 
         }else{
@@ -110,7 +108,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
         if (document != null) {
             T object = null;
             try {
-                object = (T) aClass.getDeclaredConstructor().newInstance();
+                object = (T) config.getEntityType().getDeclaredConstructor().newInstance();
                 copyCouchBaseDocumentToEntity(document, object);
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -135,7 +133,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
             for (Iterator<QueryRow> it = result; it.hasNext(); ) {
                 QueryRow row = it.next();
                 document = row.getDocument();
-                object = (T) aClass.getDeclaredConstructor().newInstance();
+                object = (T) config.getEntityType().getDeclaredConstructor().newInstance();
                 copyCouchBaseDocumentToEntity(document, object);
                 dataSet.add(object);
             }

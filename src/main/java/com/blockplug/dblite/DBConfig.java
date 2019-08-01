@@ -19,15 +19,17 @@ public class DBConfig {
     private final String dbPassword;
     private final  Class entityType;
     private final String collectionName;
-    private final DBName dbName;
+    private final DBType dbType;
+    private final  String dbName;
     private  String dbUsername;
     private DBConfig(Builder builder) {
         this.dbPath = builder.dbPath;
         this.dbPassword = builder.dbPassword;
         this.entityType=builder.entityType;
         this.collectionName =builder.collectionName;
-        this.dbName=builder.dbName;
+        this.dbType =builder.dbType;
         this.dbUsername=builder.dbUsername;
+        this.dbName=builder.dbName;
     }
 
     public String getDbUsername() {
@@ -50,8 +52,8 @@ public class DBConfig {
         return collectionName;
     }
 
-    public DBName getDbName() {
-        return dbName;
+    public DBType getDbType() {
+        return dbType;
     }
 
     public static class Builder {
@@ -60,10 +62,15 @@ public class DBConfig {
         private  String dbPassword;
         private   Class entityType;
         private  String collectionName;
-        private  DBName dbName=DBName.COUCHBASE;
+        private DBType dbType = DBType.COUCHBASE;
+        private   String dbName;
 
+        public Builder setDbType(DBType dbType) {
+            this.dbType = dbType;
+            return this;
+        }
 
-        public Builder setDbName(DBName dbName) {
+        public Builder setDbName(String dbName) {
             this.dbName = dbName;
             return this;
         }

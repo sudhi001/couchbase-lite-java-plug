@@ -21,22 +21,24 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     }
 
     private void init(DBConfig config) {
-        database= Nitrite.builder()
-                .compressed()
-                .filePath(new File(config.getDbPath()))
-                .openOrCreate(config.getDbUsername(), config.getDbPassword());
+
         if(config.getCollectionName()==null){
             if(config.getClass().isAnnotationPresent(DocumentNode.class)){
-                DocumentNode documentNode = (DocumentNode) config.getClass().getAnnotation(DocumentNode.class);
-                this.collectionName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getClass().getName().toLowerCase();
+                DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
+                this.collectionName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
             }else{
-                this.collectionName= config.getClass().getName().toLowerCase();
+                this.collectionName= config.getEntityType().getName().toLowerCase();
             }
 
         }else{
             this.collectionName=config.getCollectionName();
         }
+        database= Nitrite.builder()
+                .compressed()
+                .filePath(new File(config.getDbPath()+File.separator+collectionName+".db"))
+                .openOrCreate(config.getDbUsername(), config.getDbPassword());
         collection = database.getCollection(collectionName);
+
     }
 
     @Override
