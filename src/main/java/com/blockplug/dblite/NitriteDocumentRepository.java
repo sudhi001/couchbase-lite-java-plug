@@ -23,7 +23,7 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     private void init(DBConfig config) {
 
         if(config.getCollectionName()==null){
-            if(config.getClass().isAnnotationPresent(DocumentNode.class)){
+            if(config.getEntityType().isAnnotationPresent(DocumentNode.class)){
                 DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
                 this.collectionName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
             }else{
