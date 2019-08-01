@@ -42,6 +42,7 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
                 .filePath(new File(config.getDbPath() + collectionName + ".db"))
                 .openOrCreate(config.getDbUsername(), config.getDbPassword());
         collection = database.getCollection(collectionName);
+        createIndex();
 
     }
 

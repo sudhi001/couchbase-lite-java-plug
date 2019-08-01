@@ -4,7 +4,7 @@
 
     <groupId>com.blockplug.dblite</groupId>
     <artifactId>embeded-database</artifactId>
-    <version>1.0.14-SNAPSHOT</version>
+    <version>1.0.15-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Couchbase or Nitrite DB  Lite ORM Utility Library for Javafx Developers</name>
