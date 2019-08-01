@@ -54,9 +54,8 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
-            data.setDocumentID(String.valueOf(document.getId().getIdValue()));
         }
+        data.setDocumentID(String.valueOf(document.getId().getIdValue()));
     }
     @Override
     public boolean isKnownType(Class<?> type) {
@@ -78,9 +77,8 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
-            data.setDocumentID(document.getId());
         }
+        data.setDocumentID(document.getId());
     }
 
     private void createObject(Map<Field, Method> methodLinkedHashMap, Field field, Object value,Object entity) throws InvocationTargetException, IllegalAccessException {
