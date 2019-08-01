@@ -7,15 +7,14 @@ import org.dizitart.no2.Cursor;
 import org.dizitart.no2.Filter;
 import org.dizitart.no2.FindOptions;
 
-import java.awt.*;
 import java.util.List;
 public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T> ,ICBRepository<T>,INitriteRepository<T>{
 
     IBaseRepository<T> baseRepository;
     public DocumentRepository(DBConfig config) {
         switch (config.getDbName()){
-            case NITRITE:baseRepository= new CBDocumentRepository(config);break;
-            case COUCHBASE:baseRepository= new NitriteDocumentRepository(config);break;
+            case COUCHBASE:baseRepository= new CBDocumentRepository(config);break;
+            case NITRITE:baseRepository= new NitriteDocumentRepository(config);break;
                 default:throw new RuntimeException("Invalid database selection");
         }
     }

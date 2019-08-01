@@ -29,8 +29,9 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             add(Dictionary.class);
         }
     };
-    public String documentID = "documentID";
-    public String createdTime = "createdTime" ;
+
+    public String documentID = "DOCUMENT_ID";
+    public String createdTime = "CREATED_TIME" ;
     public BaseDocumentRepository(DBConfig config) {
         this.config=config;
     }
