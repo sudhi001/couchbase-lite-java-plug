@@ -9,7 +9,8 @@ import org.dizitart.no2.FindOptions;
 
 import java.util.List;
 public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T> ,ICBRepository<T>,INitriteRepository<T>{
-
+    protected static final String CREATED_TIME = "CREATED_TIME";
+    protected  static final  String DOCUMENT_ID = "DOCUMENT_ID";
     IBaseRepository<T> baseRepository;
     public DocumentRepository(DBConfig config) {
         switch (config.getDbName()){
