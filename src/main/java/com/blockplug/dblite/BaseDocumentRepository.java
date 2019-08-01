@@ -130,7 +130,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
                 if (value != null) {
                     if (field.getType() == ObjectProperty.class) {
                         KeyValue keyValue = (KeyValue) value;
-                        document.put(documentColumn.key(), keyValue.toString());
+                        document.put(documentColumn.key(), keyValue.combilnedValue());
                     } else if (isKnownType(field.getType()))
                         document.put(documentColumn.key(), value);
                 } else {

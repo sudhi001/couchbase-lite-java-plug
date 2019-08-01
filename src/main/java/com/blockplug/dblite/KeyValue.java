@@ -31,9 +31,12 @@ public class KeyValue {
 
     @Override
     public String toString() {
-        return getName()+":"+getKey();
+        return getName();
     }
 
+    public String combilnedValue(){
+        return getName()+":"+getKey();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
