@@ -84,7 +84,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
     private void createObject(Map<Field, Method> methodLinkedHashMap, Field field, Object value,Object entity) throws InvocationTargetException, IllegalAccessException {
         Method method = methodLinkedHashMap.get(field);
         field.setAccessible(true);
-        if ( method != null) {
+        if ( method != null&&value!=null) {
             if (field.getType() == Date.class) {
                 if(value instanceof  Long) {
                     method.invoke(entity, new Date((Long)value));
