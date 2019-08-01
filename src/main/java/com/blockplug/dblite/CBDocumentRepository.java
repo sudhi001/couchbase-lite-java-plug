@@ -48,7 +48,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
                 DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
                 this.collectionName = (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
             }else{
-                this.collectionName = config.getEntityType().getName().toLowerCase();
+                this.collectionName = config.getEntityType().getSimpleName().toLowerCase();
             }
 
         }else{

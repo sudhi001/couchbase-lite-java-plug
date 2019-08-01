@@ -27,7 +27,7 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
                 DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
                 this.collectionName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
             }else{
-                this.collectionName= config.getEntityType().getName().toLowerCase();
+                this.collectionName= config.getEntityType().getSimpleName().toLowerCase();
             }
 
         }else{
@@ -48,7 +48,7 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     @Override
     public T findOneById(String documentId) {
         try {
-            T object = (T) getConfig().getClass().getDeclaredConstructor().newInstance();
+            T object = (T) getConfig().getEntityType().getDeclaredConstructor().newInstance();
             Document document=collection.getById(NitriteId.createId(Long.parseLong(documentId)));
              copyNitriteDocumentToEntity(document,object);
              return object;
@@ -118,7 +118,7 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
         T object;
         for (Document document : cursor) {
             try {
-                object = (T) getConfig().getClass().getDeclaredConstructor().newInstance();
+                object = (T) getConfig().getEntityType().getDeclaredConstructor().newInstance();
                 copyNitriteDocumentToEntity(document,object);
                 data.add(object);
             } catch (InstantiationException e) {
