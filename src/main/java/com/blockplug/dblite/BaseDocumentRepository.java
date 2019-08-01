@@ -32,9 +32,11 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
 
     public String documentID = "DOCUMENT_ID";
     public String createdTime = "CREATED_TIME";
+    public OnDocumentLifeListener onDocumentLifeListener;
 
-    public BaseDocumentRepository(DBConfig config) {
+    public BaseDocumentRepository(DBConfig config,OnDocumentLifeListener onDocumentLifeListener) {
         this.config = config;
+        this.onDocumentLifeListener=onDocumentLifeListener;
     }
 
     public DBConfig getConfig() {

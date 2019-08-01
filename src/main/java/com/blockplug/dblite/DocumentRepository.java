@@ -10,7 +10,7 @@ import org.dizitart.no2.NitriteCollection;
 
 import java.util.List;
 
-public class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>, ICBRepository<T>, INitriteRepository<T> {
+public class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>, ICBRepository<T>, INitriteRepository<T> ,OnDocumentLifeListener{
     protected static final String CREATED_TIME = "CREATED_TIME";
     protected static final String DOCUMENT_ID = "DOCUMENT_ID";
     IBaseRepository<T> baseRepository;
@@ -18,14 +18,18 @@ public class DocumentRepository<T extends DocumentEntity> implements IBaseReposi
     public DocumentRepository(DBConfig config) {
         switch (config.getDbType()) {
             case COUCHBASE:
-                baseRepository = new CBDocumentRepository(config);
+                baseRepository = new CBDocumentRepository(config,this);
                 break;
             case NITRITE:
-                baseRepository = new NitriteDocumentRepository(config);
+                baseRepository = new NitriteDocumentRepository(config,this);
                 break;
             default:
                 throw new RuntimeException("Invalid database selection");
         }
+    }
+
+    @Override
+    public void createIndex() {
     }
 
     @Override
@@ -46,10 +50,7 @@ public class DocumentRepository<T extends DocumentEntity> implements IBaseReposi
         throw new RuntimeException("Invalid operation");
     }
 
-    @Override
-    public void createIndex() {
-        baseRepository.createIndex();
-    }
+
 
     @Override
     public Document findById(String id) {

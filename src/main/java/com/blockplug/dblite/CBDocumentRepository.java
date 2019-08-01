@@ -35,8 +35,8 @@ public class CBDocumentRepository<T extends DocumentEntity> extends BaseDocument
      *
      * @param config = {@link DBConfig}
      */
-    public CBDocumentRepository(DBConfig config) {
-        super(config);
+    public CBDocumentRepository(DBConfig config,OnDocumentLifeListener onDocumentLifeListener) {
+        super(config,onDocumentLifeListener);
         init(config);
     }
 
@@ -81,10 +81,11 @@ public class CBDocumentRepository<T extends DocumentEntity> extends BaseDocument
     /**
      * Create an index based on the document id
      */
-    @Override
-    public void createIndex() {
+
+    private void createIndex() {
         View todoView = database.getView(collectionName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
+        onDocumentLifeListener.createIndex();
     }
 
 

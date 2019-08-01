@@ -15,8 +15,8 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
     NitriteCollection collection;
     String collectionName;
 
-    public NitriteDocumentRepository(DBConfig config) {
-        super(config);
+    public NitriteDocumentRepository(DBConfig config,OnDocumentLifeListener onDocumentLifeListener) {
+        super(config,onDocumentLifeListener);
         init(config);
     }
 
@@ -42,7 +42,7 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
                 .filePath(new File(config.getDbPath() + collectionName + ".db"))
                 .openOrCreate(config.getDbUsername(), config.getDbPassword());
         collection = database.getCollection(collectionName);
-        createIndex();
+        onDocumentLifeListener.createIndex();
 
     }
 
@@ -66,10 +66,6 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
         return null;
     }
 
-    @Override
-    public void createIndex() {
-
-    }
 
     @Override
     public NitriteCollection getCollection() {

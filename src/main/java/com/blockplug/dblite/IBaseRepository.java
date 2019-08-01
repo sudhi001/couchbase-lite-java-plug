@@ -22,7 +22,6 @@ public interface IBaseRepository<T extends DocumentEntity> {
 
     public T findOneById(String documentId);
 
-    public void createIndex();
 
     public boolean deleteByDocumentId(String documentId);
 
