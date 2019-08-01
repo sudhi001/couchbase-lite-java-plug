@@ -13,7 +13,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
     Map<Field, Method> mapOfFieldMethod = new LinkedHashMap<>();
     Map<Field, Method> mapOfFieldGetMethod = new LinkedHashMap<>();
     DBConfig config;
-    protected List<Class> knownItems = new LinkedList<Class>(){
+    protected List<Class> knownItems = new LinkedList<Class>() {
         {
             add(String.class);
             add(Integer.class);
@@ -31,22 +31,24 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
     };
 
     public String documentID = "DOCUMENT_ID";
-    public String createdTime = "CREATED_TIME" ;
+    public String createdTime = "CREATED_TIME";
+
     public BaseDocumentRepository(DBConfig config) {
-        this.config=config;
+        this.config = config;
     }
 
     public DBConfig getConfig() {
         return config;
     }
+
     protected void copyNitriteDocumentToEntity(org.dizitart.no2.Document document, Object entity) {
         T data = (T) entity;
         Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
             try {
-                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
+                DocumentColumn documentColumn = field.getAnnotation(DocumentColumn.class);
                 if (document.containsKey(documentColumn.key())) {
-                    Object value=document.get(documentColumn.key());
+                    Object value = document.get(documentColumn.key());
                     createObject(methodLinkedHashMap, field, value, entity);
                 }
             } catch (InvocationTargetException e) {
@@ -57,6 +59,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         }
         data.setDocumentID(String.valueOf(document.getId().getIdValue()));
     }
+
     @Override
     public boolean isKnownType(Class<?> type) {
         return knownItems.contains(type);
@@ -67,9 +70,9 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         Map<Field, Method> methodLinkedHashMap = methodsAndFields(data.getClass());
         for (Field field : methodLinkedHashMap.keySet()) {
             try {
-                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
-                if (document.getProperty(documentColumn.key())!=null) {
-                    Object value=document.getProperty(documentColumn.key());
+                DocumentColumn documentColumn = field.getAnnotation(DocumentColumn.class);
+                if (document.getProperty(documentColumn.key()) != null) {
+                    Object value = document.getProperty(documentColumn.key());
                     createObject(methodLinkedHashMap, field, value, entity);
                 }
             } catch (InvocationTargetException e) {
@@ -81,26 +84,25 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         data.setDocumentID(document.getId());
     }
 
-    private void createObject(Map<Field, Method> methodLinkedHashMap, Field field, Object value,Object entity) throws InvocationTargetException, IllegalAccessException {
+    private void createObject(Map<Field, Method> methodLinkedHashMap, Field field, Object value, Object entity) throws InvocationTargetException, IllegalAccessException {
         Method method = methodLinkedHashMap.get(field);
         field.setAccessible(true);
-        if ( method != null&&value!=null) {
+        if (method != null && value != null) {
             if (field.getType() == Date.class) {
-                if(value instanceof  Long) {
-                    method.invoke(entity, new Date((Long)value));
-                }else{
-                    method.invoke(entity,(Date)value);
+                if (value instanceof Long) {
+                    method.invoke(entity, new Date((Long) value));
+                } else {
+                    method.invoke(entity, (Date) value);
                 }
-            }else if(field.getType() ==  ObjectProperty.class){
+            } else if (field.getType() == ObjectProperty.class) {
                 String[] datas = value.toString().split(":");
-                if(datas.length>1){
-                    method.invoke(entity, new KeyValue(datas[1],datas[0]));
+                if (datas.length > 1) {
+                    method.invoke(entity, new KeyValue(datas[1], datas[0]));
                 }
-            }else if(field.getType() ==  byte[].class){
+            } else if (field.getType() == byte[].class) {
                 byte[] datas = value.toString().getBytes();
                 method.invoke(entity, datas);
-            }
-            else{
+            } else {
                 method.invoke(entity, value);
             }
         }
@@ -124,12 +126,12 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             Method method = methodLinkedHashMap.get(field);
             try {
                 Object value = method.invoke(object);
-                DocumentColumn documentColumn= field.getAnnotation(DocumentColumn.class);
+                DocumentColumn documentColumn = field.getAnnotation(DocumentColumn.class);
                 if (value != null) {
-                    if (field.getType() ==  ObjectProperty.class){
-                        KeyValue keyValue= (KeyValue) value;
-                        document.put(documentColumn.key(), keyValue.getKey()+":"+keyValue.getName());
-                    }else if (isKnownType(field.getType()))
+                    if (field.getType() == ObjectProperty.class) {
+                        KeyValue keyValue = (KeyValue) value;
+                        document.put(documentColumn.key(), keyValue.toString());
+                    } else if (isKnownType(field.getType()))
                         document.put(documentColumn.key(), value);
                 } else {
                     document.put(documentColumn.key(), null);
@@ -142,7 +144,6 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         }
         return document;
     }
-
 
 
     private List<Method> listGetMethods(Class clazz) {
@@ -158,6 +159,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         }
         return methodsList;
     }
+
     private List<Method> listSetMethods(Class clazz) {
         List<Method> methodsList = new ArrayList<>();
         while (clazz != null) {
@@ -183,7 +185,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                if(field.isAnnotationPresent(DocumentColumn.class)) {
+                if (field.isAnnotationPresent(DocumentColumn.class)) {
                     filedList.put(field, method);
                 }
             }
@@ -191,6 +193,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         mapOfFieldGetMethod.putAll(filedList);
         return filedList;
     }
+
     private Map<Field, Method> methodsAndFields(Class clazz) {
         if (!mapOfFieldMethod.isEmpty())
             return mapOfFieldMethod;
@@ -202,7 +205,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
             Field field = getField(clazz, fieldName);
             if (field != null) {
                 field.setAccessible(true);
-                if(field.isAnnotationPresent(DocumentColumn.class)) {
+                if (field.isAnnotationPresent(DocumentColumn.class)) {
                     filedList.put(field, method);
                 }
             }
@@ -210,6 +213,7 @@ public abstract class BaseDocumentRepository<T extends DocumentEntity> implement
         mapOfFieldMethod.putAll(filedList);
         return filedList;
     }
+
     private Field getField(Class clazz, String fieldName) {
         if (clazz != null) try {
             return clazz.getDeclaredField(fieldName);

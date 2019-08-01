@@ -6,27 +6,44 @@ import com.couchbase.lite.Query;
 import org.dizitart.no2.Cursor;
 import org.dizitart.no2.Filter;
 import org.dizitart.no2.FindOptions;
+import org.dizitart.no2.NitriteCollection;
 
 import java.util.List;
-public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T> ,ICBRepository<T>,INitriteRepository<T>{
+
+public class DocumentRepository<T extends DocumentEntity> implements IBaseRepository<T>, ICBRepository<T>, INitriteRepository<T> {
     protected static final String CREATED_TIME = "CREATED_TIME";
-    protected  static final  String DOCUMENT_ID = "DOCUMENT_ID";
+    protected static final String DOCUMENT_ID = "DOCUMENT_ID";
     IBaseRepository<T> baseRepository;
+
     public DocumentRepository(DBConfig config) {
-        switch (config.getDbType()){
-            case COUCHBASE:baseRepository= new CBDocumentRepository(config);break;
-            case NITRITE:baseRepository= new NitriteDocumentRepository(config);break;
-                default:throw new RuntimeException("Invalid database selection");
+        switch (config.getDbType()) {
+            case COUCHBASE:
+                baseRepository = new CBDocumentRepository(config);
+                break;
+            case NITRITE:
+                baseRepository = new NitriteDocumentRepository(config);
+                break;
+            default:
+                throw new RuntimeException("Invalid database selection");
         }
     }
 
     @Override
     public T findOneById(String documentId) {
-        if(baseRepository instanceof ICBRepository){
-            ICBRepository<T> repository= (ICBRepository<T>) baseRepository;
-          return repository.findOneById(documentId);
+        if (baseRepository instanceof ICBRepository) {
+            ICBRepository<T> repository = (ICBRepository<T>) baseRepository;
+            return repository.findOneById(documentId);
         }
         return baseRepository.findOneById(documentId);
+    }
+
+    @Override
+    public NitriteCollection getCollection() {
+        if (baseRepository instanceof INitriteRepository) {
+            INitriteRepository<T> repository = (INitriteRepository<T>) baseRepository;
+            return repository.getCollection();
+        }
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
@@ -36,20 +53,20 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
 
     @Override
     public Document findById(String id) {
-        if(baseRepository instanceof ICBRepository){
-            ICBRepository<T> repository= (ICBRepository<T>) baseRepository;
+        if (baseRepository instanceof ICBRepository) {
+            ICBRepository<T> repository = (ICBRepository<T>) baseRepository;
             return repository.findById(id);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
     public List<T> findBy(Query query) {
-        if(baseRepository instanceof ICBRepository){
-            ICBRepository<T> repository= (ICBRepository<T>) baseRepository;
+        if (baseRepository instanceof ICBRepository) {
+            ICBRepository<T> repository = (ICBRepository<T>) baseRepository;
             return repository.findBy(query);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
@@ -59,11 +76,11 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
 
     @Override
     public List<T> findBy(Cursor cursor) {
-        if(baseRepository instanceof INitriteRepository){
-            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+        if (baseRepository instanceof INitriteRepository) {
+            INitriteRepository<T> repository = (INitriteRepository<T>) baseRepository;
             return repository.findBy(cursor);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
@@ -78,11 +95,11 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
 
     @Override
     public Database getDatabase() {
-        if(baseRepository instanceof ICBRepository){
-            ICBRepository<T> repository= (ICBRepository<T>) baseRepository;
+        if (baseRepository instanceof ICBRepository) {
+            ICBRepository<T> repository = (ICBRepository<T>) baseRepository;
             return repository.getDatabase();
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
@@ -102,12 +119,12 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
 
     @Override
     public List<T> pageOF(int offset, int limit) {
-        return baseRepository.pageOF(offset,limit);
+        return baseRepository.pageOF(offset, limit);
     }
 
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
-        return baseRepository.pageOFAscending(offset,limit);
+        return baseRepository.pageOFAscending(offset, limit);
     }
 
     @Override
@@ -122,28 +139,28 @@ public  class DocumentRepository<T extends DocumentEntity> implements IBaseRepos
 
     @Override
     public Cursor find(FindOptions findOptions) {
-        if(baseRepository instanceof INitriteRepository){
-            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+        if (baseRepository instanceof INitriteRepository) {
+            INitriteRepository<T> repository = (INitriteRepository<T>) baseRepository;
             return repository.find(findOptions);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
     public List<T> find(Filter filter) {
-        if(baseRepository instanceof INitriteRepository){
-            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
+        if (baseRepository instanceof INitriteRepository) {
+            INitriteRepository<T> repository = (INitriteRepository<T>) baseRepository;
             return repository.find(filter);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 
     @Override
     public Cursor find(Filter filter, FindOptions findOptions) {
-        if(baseRepository instanceof INitriteRepository){
-            INitriteRepository<T> repository= (INitriteRepository<T>) baseRepository;
-            return repository.find(filter,findOptions);
+        if (baseRepository instanceof INitriteRepository) {
+            INitriteRepository<T> repository = (INitriteRepository<T>) baseRepository;
+            return repository.find(filter, findOptions);
         }
-        throw  new RuntimeException("Invalid operation");
+        throw new RuntimeException("Invalid operation");
     }
 }

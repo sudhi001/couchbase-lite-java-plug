@@ -1,17 +1,17 @@
 /**
- *  Copyright 20199 Sudhi S sudhis@live.com / droidsworld@gmail.com
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright 20199 Sudhi S sudhis@live.com / droidsworld@gmail.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.blockplug.dblite;
 
@@ -22,7 +22,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumentRepository<T> implements ICBRepository<T>{
+public class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumentRepository<T> implements ICBRepository<T> {
 
     //this list Hold the methods from table to reduce the repeated reflection function and to speed up the process.
 
@@ -41,38 +41,38 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
     }
 
 
-
     private void init(DBConfig config) {
-        if(config.getCollectionName()==null){
-            if(config.getEntityType().isAnnotationPresent(DocumentNode.class)){
+        if (config.getCollectionName() == null) {
+            if (config.getEntityType().isAnnotationPresent(DocumentNode.class)) {
                 DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
-                this.collectionName = (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
-            }else{
+                this.collectionName = (documentNode.name() != null && documentNode.name().trim().length() > 0) ? documentNode.name() : config.getEntityType().getName().toLowerCase();
+            } else {
                 this.collectionName = config.getEntityType().getSimpleName().toLowerCase();
             }
 
-        }else{
-            this.collectionName =config.getCollectionName();
+        } else {
+            this.collectionName = config.getCollectionName();
         }
 
-        openOrInitDatabase( );
+        openOrInitDatabase();
     }
-    private void openOrInitDatabase(  ){
+
+    private void openOrInitDatabase() {
         try {
             DatabaseOptions options = new DatabaseOptions();
             options.setCreate(true);
-            if(getConfig().getDbPassword()!=null) {
+            if (getConfig().getDbPassword() != null) {
                 options.setEncryptionKey(getConfig().getDbPassword());
             }
-            this.manager = new Manager(new JavaContext(){
+            this.manager = new Manager(new JavaContext() {
                 @Override
                 public File getRootDirectory() {
-                    return getConfig().getDbPath()!=null?new File(getConfig().getDbPath()):super.getRootDirectory();
+                    return getConfig().getDbPath() != null ? new File(getConfig().getDbPath()) : super.getRootDirectory();
                 }
 
             }, Manager.DEFAULT_OPTIONS);
-                database = manager.openDatabase(collectionName.toLowerCase(), options);
-                createIndex();
+            database = manager.openDatabase(collectionName.toLowerCase(), options);
+            createIndex();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,7 +86,6 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
         View todoView = database.getView(collectionName);
         todoView.setMap((document, emitter) -> emitter.emit(document.get("_id"), document), "1");
     }
-
 
 
     /**
@@ -123,7 +122,8 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
         }
         return null;
     }
-@Override
+
+    @Override
     public List<T> findBy(Query query) {
         try {
             List<T> dataSet = new LinkedList<>();
@@ -138,7 +138,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
                 dataSet.add(object);
             }
             return dataSet;
-        }catch (CouchbaseLiteException e){
+        } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -159,9 +159,9 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
     public boolean deleteByDocumentId(String documentId) {
         try {
             com.couchbase.lite.Document document = database.getDocument(documentId);
-            if(document!=null){
+            if (document != null) {
                 document.delete();
-            }else{
+            } else {
                 return false;
             }
             return true;
@@ -172,18 +172,17 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
     }
 
 
-
     /**
      * Save or Update the entity
      *
      */
     @Override
-    public  T save(T entity) {
+    public T save(T entity) {
         try {
             com.couchbase.lite.Document document = TextUtils.isEmpty(entity.getDocumentID()) ? null : database.getDocument(entity.getDocumentID());
-            Map properties= createMapFromEntity(entity);
+            Map properties = createMapFromEntity(entity);
             if (document == null) {
-                document =  this.database.createDocument();
+                document = this.database.createDocument();
                 entity.setDocumentID(document.putProperties(properties).getDocument().getId());
             } else {
                 document.update(newRevision -> {
@@ -201,7 +200,6 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
     }
 
 
-
     /**
      * To check the Type of data is supported by the library of Couchbase Lite
      * @param type  {@link Class}
@@ -209,7 +207,7 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
      */
     @Override
     public boolean isKnownType(Class<?> type) {
-        return  knownItems.contains(type);
+        return knownItems.contains(type);
     }
 
     /**
@@ -224,11 +222,11 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
      * To delete the Database
      */
     @Override
-    public boolean delete()  {
+    public boolean delete() {
         try {
             database.delete();
             database.close();
-            database=null;
+            database = null;
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return false;
@@ -256,13 +254,14 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
      * Pagination function
      */
     @Override
-    public List<T> pageOF(int offset,int limit) {
-        Query query= database.createAllDocumentsQuery();
+    public List<T> pageOF(int offset, int limit) {
+        Query query = database.createAllDocumentsQuery();
         query.setLimit(limit);
         query.setSkip(offset);
         query.setDescending(true);
         return findBy(query);
     }
+
     /**
      * Pagination function
      * @param offset  Where the pagination stats
@@ -271,11 +270,12 @@ public  class CBDocumentRepository<T extends DocumentEntity> extends BaseDocumen
      */
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
-        Query query= database.createAllDocumentsQuery();
+        Query query = database.createAllDocumentsQuery();
         query.setLimit(limit);
         query.setSkip(offset);
         return findBy(query);
     }
+
     /**
      * Close the database instance.
      * Better you should call this function before the application termination.

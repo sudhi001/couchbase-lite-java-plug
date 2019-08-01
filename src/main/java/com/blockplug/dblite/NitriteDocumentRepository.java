@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseDocumentRepository<T> implements INitriteRepository<T>{
+public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDocumentRepository<T> implements INitriteRepository<T> {
     Nitrite database;
-    NitriteCollection collection ;
-    String collectionName ;
+    NitriteCollection collection;
+    String collectionName;
 
     public NitriteDocumentRepository(DBConfig config) {
         super(config);
@@ -22,24 +22,24 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
 
     private void init(DBConfig config) {
 
-        if(config.getCollectionName()==null){
-            if(config.getEntityType().isAnnotationPresent(DocumentNode.class)){
+        if (config.getCollectionName() == null) {
+            if (config.getEntityType().isAnnotationPresent(DocumentNode.class)) {
                 DocumentNode documentNode = (DocumentNode) config.getEntityType().getAnnotation(DocumentNode.class);
-                this.collectionName= (documentNode.name()!=null&&documentNode.name().trim().length()>0)?documentNode.name():config.getEntityType().getName().toLowerCase();
-            }else{
-                this.collectionName= config.getEntityType().getSimpleName().toLowerCase();
+                this.collectionName = (documentNode.name() != null && documentNode.name().trim().length() > 0) ? documentNode.name() : config.getEntityType().getName().toLowerCase();
+            } else {
+                this.collectionName = config.getEntityType().getSimpleName().toLowerCase();
             }
 
-        }else{
-            this.collectionName=config.getCollectionName();
+        } else {
+            this.collectionName = config.getCollectionName();
         }
-        File file=new File(config.getDbPath()+File.separator);
-        if(!file.exists()||!file.isDirectory()){
+        File file = new File(config.getDbPath() + File.separator);
+        if (!file.exists() || !file.isDirectory()) {
             file.mkdirs();
         }
-        database= Nitrite.builder()
+        database = Nitrite.builder()
                 .compressed()
-                .filePath(new File(config.getDbPath()+collectionName+".db"))
+                .filePath(new File(config.getDbPath() + collectionName + ".db"))
                 .openOrCreate(config.getDbUsername(), config.getDbPassword());
         collection = database.getCollection(collectionName);
 
@@ -49,9 +49,9 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     public T findOneById(String documentId) {
         try {
             T object = (T) getConfig().getEntityType().getDeclaredConstructor().newInstance();
-            Document document=collection.getById(NitriteId.createId(Long.parseLong(documentId)));
-             copyNitriteDocumentToEntity(document,object);
-             return object;
+            Document document = collection.getById(NitriteId.createId(Long.parseLong(documentId)));
+            copyNitriteDocumentToEntity(document, object);
+            return object;
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -71,55 +71,57 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     }
 
     @Override
+    public NitriteCollection getCollection() {
+        return collection;
+    }
+
+    @Override
     public boolean deleteByDocumentId(String documentId) {
-         collection.remove(Filters.eq(documentId,documentId));
-         return true;
+        collection.remove(Filters.eq(documentId, documentId));
+        return true;
     }
 
     @Override
     public T save(T entity) {
-        org.dizitart.no2.Document document=null;
+        org.dizitart.no2.Document document = null;
         try {
-           document = TextUtils.isEmpty(entity.getDocumentID()) ? null
+            document = TextUtils.isEmpty(entity.getDocumentID()) ? null
                     : collection.getById(NitriteId.createId(Long.parseLong(entity.getDocumentID())));
-            }catch (NumberFormatException e){
-            }
-            Map properties= createMapFromEntity(entity);
-            if (document == null) {
-                document =  new org.dizitart.no2.Document(properties);
-                entity.setDocumentID(String.valueOf(document.getId().getIdValue()));
-                collection.insert(document);
-            } else {
-                document.putAll(properties);
-                collection.update(Filters.eq(documentID,String.valueOf(document.getId().getIdValue())),document);
-            }
-            return entity;
+        } catch (NumberFormatException e) {
+        }
+        Map properties = createMapFromEntity(entity);
+        if (document == null) {
+            document = new org.dizitart.no2.Document(properties);
+            entity.setDocumentID(String.valueOf(document.getId().getIdValue()));
+            collection.insert(document);
+        } else {
+            document.putAll(properties);
+            collection.update(Filters.eq(documentID, String.valueOf(document.getId().getIdValue())), document);
+        }
+        return entity;
     }
-
-
-
 
 
     @Override
     public boolean delete() {
-         collection.drop();
-         return true;
+        collection.drop();
+        return true;
     }
 
     @Override
     public List<T> findAll() {
-        Cursor cursor= collection.find();
+        Cursor cursor = collection.find();
         return findBy(cursor);
     }
 
     @Override
     public List<T> findBy(Cursor cursor) {
-        List<T> data= new ArrayList<>();
+        List<T> data = new ArrayList<>();
         T object;
         for (Document document : cursor) {
             try {
                 object = (T) getConfig().getEntityType().getDeclaredConstructor().newInstance();
-                copyNitriteDocumentToEntity(document,object);
+                copyNitriteDocumentToEntity(document, object);
                 data.add(object);
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -143,18 +145,19 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
 
     @Override
     public List<T> pageOF(int offset, int limit) {
-        Cursor cursor= collection.find(FindOptions.limit(offset,limit));
+        Cursor cursor = collection.find(FindOptions.limit(offset, limit));
         return findBy(cursor);
     }
+
     @Override
     public List<T> find(Filter filter) {
-        Cursor cursor= collection.find(filter);
+        Cursor cursor = collection.find(filter);
         return findBy(cursor);
     }
 
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
-        Cursor cursor= collection.find(FindOptions.sort(createdTime,SortOrder.Ascending).limit(offset,limit));
+        Cursor cursor = collection.find(FindOptions.sort(createdTime, SortOrder.Ascending).limit(offset, limit));
         return findBy(cursor);
     }
 
@@ -167,12 +170,14 @@ public class NitriteDocumentRepository <T extends DocumentEntity>  extends BaseD
     public String getCollectionName() {
         return collectionName;
     }
+
     @Override
-    public  Cursor find(FindOptions findOptions){
+    public Cursor find(FindOptions findOptions) {
         return collection.find(findOptions);
     }
+
     @Override
-    public  Cursor find(Filter filter,FindOptions findOptions){
-        return collection.find(filter,findOptions);
+    public Cursor find(Filter filter, FindOptions findOptions) {
+        return collection.find(filter, findOptions);
     }
 }
