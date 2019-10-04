@@ -4,7 +4,7 @@
 
     <groupId>com.blockplug.dblite</groupId>
     <artifactId>embeded-database</artifactId>
-    <version>1.0.19</version>
+    <version>1.0.20-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Couchbase or Nitrite DB  Lite ORM Utility Library for Javafx Developers</name>
@@ -117,7 +117,7 @@
         <developerConnection>scm:git:https://github.com/sudhi001/couchbase-lite-java-plug</developerConnection>
         <url>https://github.com/sudhi001/couchbase-lite-java-plug</url>
         <connection>scm:git:https://github.com/sudhi001/couchbase-lite-java-plug</connection>
-      <tag>embeded-database-1.0.19</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <licenses>
