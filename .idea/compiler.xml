@@ -6,8 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="embeded-database" />
         <module name="couchbase-lite-java-plug" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="couchbase-lite-java-plug" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
