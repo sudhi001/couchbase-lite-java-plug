@@ -78,7 +78,7 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
 
     @Override
     public boolean deleteByDocumentId(String documentId) {
-        collection.remove(Filters.eq(documentId, documentId));
+        collection.remove(Filters.eq(DOCUMENT_ID, documentId));
         return true;
     }
 
@@ -97,7 +97,7 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
             collection.insert(document);
         } else {
             document.putAll(properties);
-            collection.update(Filters.eq(documentID, String.valueOf(document.getId().getIdValue())), document);
+            collection.update(Filters.eq(DOCUMENT_ID, String.valueOf(document.getId().getIdValue())), document);
         }
         return entity;
     }
@@ -158,7 +158,7 @@ public class NitriteDocumentRepository<T extends DocumentEntity> extends BaseDoc
 
     @Override
     public List<T> pageOFAscending(int offset, int limit) {
-        Cursor cursor = collection.find(FindOptions.sort(createdTime, SortOrder.Ascending).limit(offset, limit));
+        Cursor cursor = collection.find(FindOptions.sort(CREATED_TIME, SortOrder.Ascending).limit(offset, limit));
         return findBy(cursor);
     }
 
